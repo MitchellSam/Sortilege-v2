@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  ::-webkit-scrollbar{width:11px;height:11px;}
+  ::-webkit-scrollbar-thumb{background:#262c34;border-radius:7px;border:3px solid transparent;background-clip:content-box;}
+  ::-webkit-scrollbar-thumb:hover{background:#39414c;background-clip:content-box;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  input,button{font-family:inherit;}
+  input:focus{outline:none;}
+  @keyframes scSlideIn{from{transform:translateX(28px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  @keyframes scFadeUp{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  @keyframes scSpin{to{transform:rotate(360deg);}}
+  @keyframes scToast{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+</style>
+</helmet>
+<div style="--accent: {{ accentVar }}; height:100vh; display:flex; flex-direction:column; background:#0d0f13; color:#d7dbe0; font-family:'Geist', system-ui, -apple-system, sans-serif; font-size:13px; line-height:1.4; -webkit-font-smoothing:antialiased; overflow:hidden;">
+
+  <div style="height:48px; flex:none; display:flex; align-items:center; gap:16px; padding:0 16px; border-bottom:1px solid #1d2228; background:#101318; z-index:6;">
+    <div style="display:flex; align-items:center; gap:9px;">
+      <div style="width:23px; height:23px; border-radius:7px; background:linear-gradient(140deg, var(--accent,#5b8cd6), #34528c); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:13px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);">S</div>
+      <div style="font-weight:600; letter-spacing:0.2px; color:#eceef1; font-size:14px;">Sortilege</div>
+    </div>
+    <div style="width:1px; height:18px; background:#252b33;"></div>
+    <div style="display:flex; align-items:center; gap:3px;">
+      <div onClick="{{ goReview }}" style="display:flex; align-items:center; gap:8px; padding:6px 11px; border-radius:7px; cursor:pointer; font-weight:500; background: {{ reviewTabBg }}; color: {{ reviewTabColor }};">
+        Review
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:18px; padding:0 6px; border-radius:9px; background:rgba(91,140,214,0.16); color:var(--accent,#5b8cd6); font-size:11px; font-weight:600; font-variant-numeric:tabular-nums;">{{ heldBadge }}</span>
+      </div>
+      <div onClick="{{ goSetup }}" style="padding:6px 11px; border-radius:7px; cursor:pointer; font-weight:500; background: {{ setupTabBg }}; color: {{ setupTabColor }};">Setup</div>
+      <div onClick="{{ goSettings }}" style="display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:7px; cursor:pointer; font-weight:500; background: {{ settingsTabBg }}; color: {{ settingsTabColor }};">
+        <span style="font-size:13px;">⚙</span> Settings
+      </div>
+    </div>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:9px; color:#5c636e; font-size:12px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#5cb98b; box-shadow:0 0 7px rgba(92,185,139,0.6);"></span>
+      {{ navStatus }}
+    </div>
+  </div>
+
+  <div style="flex:1; min-height:0; position:relative; display:{{ reviewDisplay }};">
+
+      <div style="width: {{ treeWidthPx }}; flex:none; display:flex; flex-direction:column; border-right:1px solid #1d2228; background:#0f1217; min-height:0;">
+        <div style="padding:11px 13px 7px; font-size:10.5px; letter-spacing:0.7px; text-transform:uppercase; color:#5c636e; font-weight:600; display:flex; align-items:center; justify-content:space-between;">
+          <span>Folder tree</span>
+          <span style="color:#454c56;">E:\</span>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:2px 7px 12px; min-height:0;">
+          <sc-for list="{{ treeNodes }}" as="n" hint-placeholder-count="11">
+            <sc-if value="{{ n.isNode }}">
+              <div onClick="{{ n.onToggle }}" onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ n.onLeave }}" onDragOver="{{ n.onDragOver }}" onDragEnter="{{ n.onDragOver }}" onDragLeave="{{ n.onDragLeave }}" onDrop="{{ n.onDrop }}" style="display:flex; align-items:center; gap:7px; height:27px; padding-right:8px; padding-left: {{ n.padLeft }}; border-radius:6px; cursor:pointer; color: {{ n.nameColor }}; background: {{ n.bg }}; box-shadow: {{ n.ring }}; font-style: {{ n.fontStyle }}; transition:background 0.08s;">
+                <span style="width:11px; flex:none; color:#586069; font-size:9px; text-align:center;">{{ n.chevron }}</span>
+                <span style="flex:none; color: {{ n.iconColor }}; display:flex; align-items:center;">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 4.2c0-.66.54-1.2 1.2-1.2h3.1c.4 0 .77.2.99.53l.6.9c.07.1.18.17.3.17h5.4c.66 0 1.2.54 1.2 1.2v6c0 .66-.54 1.2-1.2 1.2H2.7c-.66 0-1.2-.54-1.2-1.2V4.2z" fill="currentColor" opacity="0.92"/></svg>
+                </span>
+                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ n.name }}</span>
+                <span onClick="{{ n.onAddFolder }}" title="New subfolder" style="flex:none; width:17px; height:17px; border-radius:5px; display:flex; align-items:center; justify-content:center; color:#7d8590; font-size:14px; line-height:1; opacity: {{ n.addOpacity }}; transition:opacity 0.1s;" style-hover="background:#272d36; color:#cfd3d9;">＋</span>
+                <span style="flex:none; font-variant-numeric:tabular-nums; font-size:11px; color:#6b7280; min-width:14px; text-align:right;">{{ n.count }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ n.isInput }}">
+              <div style="display:flex; align-items:center; gap:7px; height:31px; padding-left: {{ n.padLeft }}; padding-right:8px;">
+                <span style="width:11px; flex:none;"></span>
+                <span style="color:var(--accent,#5b8cd6); display:flex;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1.5 4.2c0-.66.54-1.2 1.2-1.2h3.1c.4 0 .77.2.99.53l.6.9c.07.1.18.17.3.17h5.4c.66 0 1.2.54 1.2 1.2v6c0 .66-.54 1.2-1.2 1.2H2.7c-.66 0-1.2-.54-1.2-1.2V4.2z" fill="currentColor"/></svg></span>
+                <input value="{{ n.value }}" onInput="{{ n.onInput }}" onKeyDown="{{ n.onKeyDown }}" placeholder="folder name" style="flex:1; min-width:0; background:#0a0c10; border:1px solid var(--accent,#5b8cd6); border-radius:5px; color:#eceef1; padding:4px 8px; font-size:12px; font-family:'Geist Mono',monospace;" />
+                <span onClick="{{ n.onCancel }}" style="cursor:pointer; color:#5c636e; font-size:13px;">✕</span>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+        <div style="flex:none; border-top:1px solid #1d2228; padding:10px 13px; font-size:11px; color:#5c636e; font-family:'Geist Mono',monospace; letter-spacing:0.1px;">{{ summaryLine }}</div>
+      </div>
+
+      <div onMouseDown="{{ onStartResize }}" style="width:7px; flex:none; cursor:col-resize; margin-left:-3px; margin-right:-4px; z-index:4; position:relative;"></div>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#0d0f13;">
+
+        <div style="flex:none; display:flex; align-items:center; gap:9px; padding:10px 14px; border-bottom:1px solid #1d2228; flex-wrap:wrap;">
+          <button onClick="{{ onSelectHighConf }}" style="display:flex; align-items:center; gap:7px; padding:7px 13px; border-radius:7px; border:1px solid #2a3038; background:#171b21; color:#cfd3d9; font-weight:500; font-size:12.5px; cursor:pointer;" style-hover="background:#1d222a; border-color:#36404c;">
+            <span style="color:#5cb98b;">✓</span> Select all high-confidence
+          </button>
+          <button onClick="{{ onConfirmSelected }}" style="display:flex; align-items:center; gap:7px; padding:7px 15px; border-radius:7px; border:1px solid transparent; background: {{ confirmSelectedBg }}; color: {{ confirmSelectedColor }}; font-weight:600; font-size:12.5px; cursor: {{ confirmSelectedCursor }};" style-hover="filter:brightness(1.08);">{{ confirmSelectedLabel }}</button>
+          <div style="width:1px; height:20px; background:#222830;"></div>
+          <sc-if value="{{ hasUndo }}">
+            <button onClick="{{ onUndo }}" style="display:flex; align-items:center; gap:7px; padding:7px 13px; border-radius:7px; border:1px solid #2a3038; background:transparent; color:#aeb4be; font-weight:500; font-size:12.5px; cursor:pointer;" style-hover="background:#171b21; color:#d7dbe0;">
+              <span style="font-size:13px;">↺</span> {{ undoLabel }}
+            </button>
+          </sc-if>
+          <div style="margin-left:auto; display:flex; align-items:center; gap:7px;">
+            <button onClick="{{ onToggleHeldOnly }}" style="display:flex; align-items:center; gap:7px; padding:7px 12px; border-radius:7px; border:1px solid {{ heldFilterBorder }}; background: {{ heldFilterBg }}; color: {{ heldFilterColor }}; font-weight:500; font-size:12.5px; cursor:pointer;">
+              <span style="width:8px; height:8px; border-radius:50%; background:#d9a441;"></span> {{ heldFilterLabel }}
+            </button>
+            <button onClick="{{ onToggleSort }}" style="display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:7px; border:1px solid #2a3038; background:#171b21; color:#aeb4be; font-weight:500; font-size:12.5px; cursor:pointer;" style-hover="border-color:#36404c;">{{ sortLabel }}</button>
+          </div>
+        </div>
+
+        <sc-if value="{{ showProgress }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none; padding:11px 16px; border-bottom:1px solid #1d2228; background:#101620;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:12.5px; color:#cfd3d9;">
+              <span style="display:flex; align-items:center; gap:9px;"><span style="width:13px; height:13px; border:2px solid rgba(91,140,214,0.3); border-top-color:var(--accent,#5b8cd6); border-radius:50%; display:inline-block; animation:scSpin 0.7s linear infinite;"></span> Processing batch…</span>
+              <span style="font-variant-numeric:tabular-nums; color:#7c828c;">{{ progressLabel }}</span>
+            </div>
+            <div style="height:5px; border-radius:3px; background:#1c222b; overflow:hidden;"><div style="height:100%; width: {{ progressPct }}; background:var(--accent,#5b8cd6); border-radius:3px; transition:width 0.1s;"></div></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showBanner }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none; display:flex; align-items:center; gap:14px; padding:12px 16px; border-bottom:1px solid #28303c; background:linear-gradient(180deg,#121a26,#101620);">
+            <span style="display:flex; width:26px; height:26px; border-radius:7px; background:rgba(91,140,214,0.16); color:var(--accent,#5b8cd6); align-items:center; justify-content:center; font-size:15px;">↦</span>
+            <div style="flex:1;">
+              <div style="font-weight:600; color:#eceef1; font-size:13px;">{{ bannerLine }}</div>
+              <div style="color:#7c828c; font-size:12px; margin-top:1px;">Nothing is deleted — keepers are moved or copied, dupes are skipped.</div>
+            </div>
+            <button onClick="{{ onCancelBanner }}" style="padding:7px 14px; border-radius:7px; border:1px solid #2a3038; background:transparent; color:#aeb4be; font-weight:500; font-size:12.5px; cursor:pointer;" style-hover="background:#171b21;">Cancel</button>
+            <button onClick="{{ onProceed }}" style="padding:7px 17px; border-radius:7px; border:none; background:var(--accent,#5b8cd6); color:#fff; font-weight:600; font-size:12.5px; cursor:pointer;" style-hover="filter:brightness(1.08);">Proceed</button>
+          </div>
+        </sc-if>
+
+        <div style="flex:1; overflow-y:auto; min-height:0; padding:11px 13px 44px;">
+
+          <sc-if value="{{ hasSuggestions }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="2">
+              <div style="margin-bottom:7px; border:1px solid #243246; border-left:2px solid var(--accent,#5b8cd6); border-radius:9px; background:rgba(91,140,214,0.055); padding:11px 13px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <span style="color:var(--accent,#5b8cd6); font-size:15px; flex:none;">✦</span>
+                  <div style="flex:1; min-width:0; font-size:12.5px;">
+                    <span style="color:#8c93a0;">{{ s.kindLabel }}</span>
+                    <span style="font-family:'Geist Mono',monospace; color:#cdd6e6; margin:0 5px;">{{ s.target }}</span>
+                    <span style="color:#6b7280;">{{ s.note }}</span>
+                  </div>
+                  <sc-if value="{{ s.canRename }}">
+                    <button onClick="{{ s.onRename }}" style="padding:5px 11px; border-radius:6px; border:1px solid #2a3038; background:transparent; color:#aeb4be; font-size:12px; font-weight:500; cursor:pointer; flex:none;" style-hover="background:#171b21;">Rename</button>
+                  </sc-if>
+                  <button onClick="{{ s.onAccept }}" style="padding:5px 13px; border-radius:6px; border:1px solid rgba(91,140,214,0.4); background:rgba(91,140,214,0.14); color:var(--accent,#5b8cd6); font-size:12px; font-weight:600; cursor:pointer; flex:none;" style-hover="background:rgba(91,140,214,0.22);">Accept</button>
+                  <button onClick="{{ s.onDismiss }}" style="padding:5px 11px; border-radius:6px; border:1px solid transparent; background:transparent; color:#6b7280; font-size:12px; font-weight:500; cursor:pointer; flex:none;" style-hover="color:#aeb4be;">Dismiss</button>
+                </div>
+                <sc-if value="{{ s.renaming }}">
+                  <div style="display:flex; align-items:center; gap:8px; margin-top:9px; padding-left:27px;">
+                    <input value="{{ s.renameVal }}" onInput="{{ s.onRenameInput }}" onKeyDown="{{ s.onRenameKey }}" style="flex:1; background:#0a0c10; border:1px solid var(--accent,#5b8cd6); border-radius:6px; color:#eceef1; padding:6px 9px; font-size:12px; font-family:'Geist Mono',monospace;" />
+                    <button onClick="{{ s.onRenameCommit }}" style="padding:6px 13px; border-radius:6px; border:none; background:var(--accent,#5b8cd6); color:#fff; font-size:12px; font-weight:600; cursor:pointer;">Save</button>
+                    <button onClick="{{ s.onRenameCancel }}" style="padding:6px 11px; border-radius:6px; border:1px solid #2a3038; background:transparent; color:#aeb4be; font-size:12px; cursor:pointer;">Cancel</button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <div style="height:5px;"></div>
+          </sc-if>
+
+          <sc-for list="{{ groups }}" as="g" hint-placeholder-count="6">
+            <div style="margin-bottom:6px; border:1px solid #1d2228; border-radius:9px; overflow:hidden; background: {{ g.rowBg }};">
+              <div onClick="{{ g.onToggleExpand }}" style="display:flex; align-items:center; gap:12px; padding:9px 13px 9px 0; cursor:pointer; border-left:2px solid {{ g.accent }};" style-hover="background:#161a20;">
+                <div style="width:11px; flex:none;"></div>
+                <sc-if value="{{ g.showCheck }}">
+                  <div onClick="{{ g.onToggleCheck }}" style="width:16px; height:16px; border-radius:4px; border:1px solid {{ g.checkBorder }}; background: {{ g.checkBg }}; display:flex; align-items:center; justify-content:center; flex:none; color:#fff; font-size:11px; line-height:1; cursor:pointer;">{{ g.checkMark }}</div>
+                </sc-if>
+                <sc-if value="{{ g.isError }}">
+                  <span style="color:#d96a6a; font-size:15px; width:16px; flex:none; text-align:center;">⚠</span>
+                </sc-if>
+                <div style="font-variant-numeric:tabular-nums; font-weight:600; color:#eceef1; min-width:78px; flex:none; font-size:13px;">{{ g.countLabel }}</div>
+                <span style="color:#586069; flex:none;">→</span>
+                <div style="font-family:'Geist Mono',monospace; font-size:12px; color: {{ g.destColor }}; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ g.dest }}</div>
+                <sc-if value="{{ g.showConf }}">
+                  <div style="display:flex; align-items:center; gap:7px; color: {{ g.accent }}; font-size:12px; flex:none; justify-content:flex-end; font-variant-numeric:tabular-nums;">
+                    <span style="width:7px; height:7px; border-radius:50%; background: {{ g.accent }};"></span>{{ g.confLabel }}
+                  </div>
+                </sc-if>
+                <sc-if value="{{ g.softLabel }}">
+                  <div style="color:#6b7280; font-size:12px; flex:none; font-style:italic;">{{ g.confLabel }}</div>
+                </sc-if>
+                <sc-if value="{{ g.showConfirm }}">
+                  <button onClick="{{ g.onConfirm }}" style="background: {{ g.confirmBg }}; color: {{ g.confirmColor }}; border:1px solid {{ g.confirmBorder }}; border-radius:6px; padding:5px 15px; font-weight:600; font-size:12px; cursor:pointer; flex:none;" style-hover="filter:brightness(1.1);">{{ g.confirmLabel }}</button>
+                </sc-if>
+                <sc-if value="{{ g.isError }}">
+                  <span style="color:#7c828c; font-size:12px; flex:none;">expand</span>
+                </sc-if>
+                <span style="width:16px; text-align:center; color:#586069; flex:none; margin-right:6px;">{{ g.chevron }}</span>
+              </div>
+
+              <sc-if value="{{ g.expanded }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #181c22; background:#0a0c10;">
+                  <div style="display:flex; align-items:center; gap:10px; padding:6px 13px 6px 49px; font-size:10.5px; letter-spacing:0.4px; text-transform:uppercase; color:#4f566083; color:#525a64; border-bottom:1px solid #14181d;">
+                    <span style="flex:1;">Name</span>
+                    <span style="width:48px; text-align:right;">Conf</span>
+                    <span style="width:150px;">Destination</span>
+                    <span style="width:62px; text-align:right;">Size</span>
+                    <span style="width:84px; text-align:right;">Modified</span>
+                  </div>
+                  <sc-for list="{{ g.files }}" as="f" hint-placeholder-count="4">
+                    <sc-if value="{{ f.isFile }}">
+                      <div draggable="true" onDragStart="{{ f.onDragStart }}" onDragEnd="{{ f.onDragEnd }}" onClick="{{ f.onClick }}" style="display:flex; align-items:center; gap:10px; padding:6px 13px 6px 21px; cursor:pointer; border-bottom:1px solid #111419; opacity: {{ f.opacity }};" style-hover="background:#12161b;">
+                        <div onClick="{{ f.onToggleCheck }}" style="width:15px; height:15px; border-radius:4px; border:1px solid {{ f.checkBorder }}; background: {{ f.checkBg }}; display:flex; align-items:center; justify-content:center; flex:none; color:#fff; font-size:10px; cursor:pointer;">{{ f.checkMark }}</div>
+                        <span style="color:#4d5560; flex:none; cursor:grab; font-size:13px; line-height:1;">⠿</span>
+                        <span style="flex:1; min-width:0; font-family:'Geist Mono',monospace; font-size:12px; color:#cfd3d9; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.name }}</span>
+                        <span style="width:48px; text-align:right; color: {{ f.confColor }}; font-variant-numeric:tabular-nums; font-weight:500; flex:none;">{{ f.confLabel }}</span>
+                        <span style="width:150px; flex:none; font-family:'Geist Mono',monospace; color:#6b7280; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ f.dest }}</span>
+                        <span style="width:62px; text-align:right; color:#7c828c; font-variant-numeric:tabular-nums; flex:none;">{{ f.size }}</span>
+                        <span style="width:84px; text-align:right; color:#646b75; font-family:'Geist Mono',monospace; font-size:11px; flex:none;">{{ f.modified }}</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ f.isMore }}">
+                      <div onClick="{{ f.onClick }}" style="padding:8px 13px 8px 49px; font-size:12px; color:#5c636e; cursor:pointer; font-style:italic;" style-hover="color:#8c93a0;">{{ f.label }}</div>
+                    </sc-if>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:90px 20px; text-align:center; color:#5c636e;">
+              <div style="width:54px; height:54px; border-radius:14px; border:1.5px dashed #2c333d; display:flex; align-items:center; justify-content:center; margin-bottom:18px; color:#454c56;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </div>
+              <div style="font-size:15px; color:#aeb4be; font-weight:500; margin-bottom:5px;">All caught up.</div>
+              <div style="font-size:13px;">Drag more files onto Sortilege when you're ready.</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; bottom:18px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; padding:11px 14px 11px 16px; border-radius:10px; background:#1a1f27; border:1px solid #2c333d; box-shadow:0 16px 40px rgba(0,0,0,0.45); z-index:7; white-space:nowrap;">
+            <span style="display:flex; width:20px; height:20px; border-radius:50%; background:rgba(92,185,139,0.16); color:#5cb98b; align-items:center; justify-content:center; font-size:12px; flex:none;">✓</span>
+            <span style="font-size:12.5px; color:#d7dbe0;">{{ toastText }}</span>
+            <sc-if value="{{ toastHasUndo }}">
+              <button onClick="{{ onToastUndo }}" style="padding:4px 11px; border-radius:6px; border:1px solid #36404c; background:transparent; color:var(--accent,#5b8cd6); font-size:12px; font-weight:600; cursor:pointer;" style-hover="background:#171b21;">Undo</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ detail.onClose }}" style="position:absolute; inset:0; background:rgba(6,8,11,0.45); z-index:8;"></div>
+        <div style="position:absolute; top:0; right:0; bottom:0; width:404px; background:#0f1217; border-left:1px solid #242a32; box-shadow:-24px 0 60px rgba(0,0,0,0.45); display:flex; flex-direction:column; z-index:9;">
+          <div style="flex:none; display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid #1d2228;">
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'Geist Mono',monospace; font-size:13px; color:#eceef1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ detail.name }}</div>
+              <div style="font-size:11.5px; color:#6b7280; margin-top:2px;">{{ detail.metaLine }}</div>
+            </div>
+            <div onClick="{{ detail.onClose }}" style="width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; color:#8c93a0; cursor:pointer; flex:none; font-size:15px;" style-hover="background:#1a1f27; color:#d7dbe0;">✕</div>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:16px;">
+            <div style="height:158px; border-radius:11px; border:1px solid #20262e; background: {{ detail.thumbBg }}; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; margin-bottom:16px;">
+              <span style="font-family:'Geist Mono',monospace; font-weight:600; font-size:15px; color: {{ detail.thumbInk }}; letter-spacing:1px; text-transform:uppercase; opacity:0.92;">{{ detail.thumbLabel }}</span>
+              <span style="position:absolute; bottom:9px; right:11px; font-size:10.5px; color: {{ detail.thumbInk }}; opacity:0.6; font-family:'Geist Mono',monospace;">{{ detail.thumbTag }}</span>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
+              <span style="padding:4px 10px; border-radius:6px; background:rgba(91,140,214,0.13); border:1px solid rgba(91,140,214,0.3); color:var(--accent,#5b8cd6); font-size:11.5px; font-weight:600;">{{ detail.tierBadge }}</span>
+              <span style="color:#6b7280; font-size:11.5px;">{{ detail.tierMeaning }}</span>
+            </div>
+
+            <div style="margin-bottom:6px; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; color:#525a64; font-weight:600;">Confidence</div>
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:18px;">
+              <div style="flex:1; height:7px; border-radius:4px; background:#181c22; overflow:hidden;"><div style="height:100%; width: {{ detail.confPct }}; background: {{ detail.confColor }}; border-radius:4px;"></div></div>
+              <span style="font-variant-numeric:tabular-nums; font-weight:600; color: {{ detail.confColor }}; font-size:13px;">{{ detail.confLabel }}</span>
+            </div>
+
+            <div style="margin-bottom:6px; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; color:#525a64; font-weight:600;">AI reasoning</div>
+            <div style="padding:11px 13px; border-radius:9px; background:#13161b; border:1px solid #1d2228; color:#aeb4be; font-size:12.5px; line-height:1.55; margin-bottom:18px;">{{ detail.reasoning }}</div>
+
+            <sc-if value="{{ detail.isDupe }}">
+              <div style="margin-bottom:6px; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; color:#525a64; font-weight:600;">Duplicate of</div>
+              <div style="display:flex; align-items:center; gap:9px; padding:10px 12px; border-radius:9px; background:rgba(217,164,65,0.07); border:1px solid rgba(217,164,65,0.22); color:#d9a441; font-family:'Geist Mono',monospace; font-size:11.5px; margin-bottom:18px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">⤷ {{ detail.dupeOf }}</div>
+            </sc-if>
+
+            <div style="margin-bottom:6px; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; color:#525a64; font-weight:600;">Source path</div>
+            <div style="padding:9px 12px; border-radius:9px; background:#13161b; border:1px solid #1d2228; color:#8c93a0; font-family:'Geist Mono',monospace; font-size:11.5px; margin-bottom:18px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ detail.source }}</div>
+
+            <div style="margin-bottom:6px; font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase; color:#525a64; font-weight:600;">Destination</div>
+            <div style="display:flex; align-items:center; gap:8px; padding:8px 11px; border-radius:9px; background:#13161b; border:1px solid #283038; margin-bottom:8px;">
+              <span style="color:#586069;">→</span>
+              <input value="{{ detail.dest }}" readOnly="true" style="flex:1; min-width:0; background:transparent; border:none; color:#cdd6e6; font-family:'Geist Mono',monospace; font-size:12px;" />
+            </div>
+            <div style="font-size:11.5px; color:#6b7280;">Drag the file onto a folder in the tree to re-route it.</div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+  <div style="flex:1; overflow-y:auto; display:{{ setupDisplay }}; justify-content:center; align-items:flex-start; padding:46px 20px 60px; background:radial-gradient(1100px 460px at 50% -8%, rgba(91,140,214,0.07), transparent);">
+      <div style="width:600px; max-width:100%;">
+        <div style="display:flex; align-items:center; margin-bottom:28px;">
+          <sc-for list="{{ setupSteps }}" as="st" hint-placeholder-count="5">
+            <div onClick="{{ st.onClick }}" style="display:flex; align-items:center; gap:9px; cursor:pointer;">
+              <span style="width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex:none; background: {{ st.dotBg }}; color: {{ st.dotColor }}; border:1px solid {{ st.dotBorder }};">{{ st.mark }}</span>
+              <span style="font-size:12.5px; color: {{ st.labelColor }}; font-weight:500;">{{ st.label }}</span>
+            </div>
+            <div style="flex:1; height:1px; background: {{ st.connector }}; margin:0 11px;"></div>
+          </sc-for>
+        </div>
+
+        <div style="background:#14171c; border:1px solid #232a32; border-radius:14px; padding:30px 30px 26px; box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+
+          <sc-if value="{{ setupS1 }}">
+            <div style="font-size:20px; font-weight:600; color:#eceef1; margin-bottom:7px; letter-spacing:-0.2px;">Where should your organized files live?</div>
+            <div style="color:#8c93a0; font-size:13px; margin-bottom:24px;">Sortilege moves or copies keepers into this folder tree. It never deletes from the source.</div>
+            <div style="display:flex; gap:9px; margin-bottom:20px;">
+              <input value="{{ setupName }}" onInput="{{ onSetupName }}" style="flex:1; background:#0a0c10; border:1px solid #2a3038; border-radius:8px; color:#eceef1; padding:11px 13px; font-size:13.5px; font-family:'Geist Mono',monospace;" />
+              <button style="padding:0 16px; border-radius:8px; border:1px solid #2a3038; background:#171b21; color:#cfd3d9; font-weight:500; font-size:13px; cursor:pointer;" style-hover="background:#1d222a;">Browse…</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:9px; margin-bottom:4px;">
+              <div style="display:flex; align-items:center; gap:9px; font-size:12.5px; color:#aeb4be;"><span style="color:#5cb98b;">✓</span> Drive <span style="font-family:'Geist Mono',monospace; color:#cdd6e6;">E:</span> present</div>
+              <div style="display:flex; align-items:center; gap:9px; font-size:12.5px; color:#aeb4be;"><span style="color:#5cb98b;">✓</span> Writable</div>
+              <div style="display:flex; align-items:center; gap:9px; font-size:12.5px; color:#aeb4be;"><span style="color:#5cb98b;">✓</span> Free space — <span style="color:#cdd6e6;">847 GB available</span> <span style="color:#6b7280;">· ~15 GB required</span></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ setupS2 }}">
+            <div style="font-size:20px; font-weight:600; color:#eceef1; margin-bottom:7px; letter-spacing:-0.2px;">Connect to Claude</div>
+            <div style="color:#8c93a0; font-size:13px; margin-bottom:24px;">Your Anthropic API key powers the classification cascade. Paste it below.</div>
+            <div style="position:relative; margin-bottom:13px;">
+              <input value="{{ apiKey }}" onInput="{{ onApiInput }}" type="password" placeholder="sk-ant-api03-…" style="width:100%; background:#0a0c10; border:1px solid {{ apiBorder }}; border-radius:8px; color:#eceef1; padding:11px 40px 11px 13px; font-size:13.5px; font-family:'Geist Mono',monospace;" />
+              <span style="position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:13px;">{{ apiIcon }}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:12.5px; color: {{ apiMsgColor }}; min-height:18px; margin-bottom:16px;">{{ apiMsg }}</div>
+            <div style="display:flex; gap:9px; align-items:flex-start; padding:11px 13px; border-radius:9px; background:#13161b; border:1px solid #1d2228; color:#8c93a0; font-size:12px; line-height:1.5;">
+              <span style="color:#6b7280; flex:none;">🔒</span> Stored securely in Windows Credential Manager — never saved to disk.
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ setupS3 }}">
+            <div style="font-size:20px; font-weight:600; color:#eceef1; margin-bottom:7px; letter-spacing:-0.2px;">Checking your system</div>
+            <div style="color:#8c93a0; font-size:13px; margin-bottom:22px;">Sortilege scans the folders it will watch for incoming files.</div>
+            <div style="display:flex; flex-direction:column; gap:2px; margin-bottom:20px;">
+              <div style="display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid #1d2228;"><span style="color:#5cb98b; width:16px;">✓</span><span style="flex:1; color:#d7dbe0; font-size:13px;">Downloads</span><span style="color:#6b7280; font-size:12px;">ready</span></div>
+              <div style="display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid #1d2228;"><span style="color:#5cb98b; width:16px;">✓</span><span style="flex:1; color:#d7dbe0; font-size:13px;">Documents</span><span style="color:#6b7280; font-size:12px;">ready</span></div>
+              <div style="display:flex; align-items:center; gap:10px; padding:11px 0;"><span style="color:#d9a441; width:16px;">⚠</span><span style="flex:1; color:#d7dbe0; font-size:13px;">Desktop <span style="color:#6b7280;">— OneDrive redirected, files on-demand detected</span></span></div>
+            </div>
+            <div style="padding:14px; border-radius:10px; background:rgba(217,164,65,0.06); border:1px solid rgba(217,164,65,0.2);">
+              <div style="font-size:12.5px; color:#d7dbe0; margin-bottom:11px; font-weight:500;">How should Sortilege handle cloud-only files?</div>
+              <div onClick="{{ onPolicyHydrate }}" style="display:flex; align-items:flex-start; gap:10px; padding:9px; border-radius:8px; cursor:pointer; margin-bottom:5px; background: {{ policyHydrateBg }};">
+                <span style="width:16px; height:16px; border-radius:50%; border:1px solid {{ policyHydrateBorder }}; flex:none; margin-top:1px; display:flex; align-items:center; justify-content:center;"><span style="width:8px; height:8px; border-radius:50%; background: {{ policyHydrateDot }};"></span></span>
+                <div><div style="font-size:12.5px; color:#d7dbe0;">Hydrate files before processing</div><div style="font-size:11.5px; color:#6b7280;">Downloads cloud-only files so they can be read.</div></div>
+              </div>
+              <div onClick="{{ onPolicySkip }}" style="display:flex; align-items:flex-start; gap:10px; padding:9px; border-radius:8px; cursor:pointer; background: {{ policySkipBg }};">
+                <span style="width:16px; height:16px; border-radius:50%; border:1px solid {{ policySkipBorder }}; flex:none; margin-top:1px; display:flex; align-items:center; justify-content:center;"><span style="width:8px; height:8px; border-radius:50%; background: {{ policySkipDot }};"></span></span>
+                <div><div style="font-size:12.5px; color:#d7dbe0;">Skip cloud-only files</div><div style="font-size:11.5px; color:#6b7280;">Leaves them in place and flags them for later.</div></div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ setupS4 }}">
+            <div style="font-size:20px; font-weight:600; color:#eceef1; margin-bottom:7px; letter-spacing:-0.2px;">Set up your top-level folders</div>
+            <div style="color:#8c93a0; font-size:13px; margin-bottom:20px;">These nine categories seed your tree. Rename them to match how you think.</div>
+            <div style="display:flex; flex-direction:column; gap:5px; margin-bottom:14px;">
+              <sc-for list="{{ taxoRows }}" as="t" hint-placeholder-count="9">
+                <div style="display:flex; align-items:center; gap:11px; padding:9px 11px; border-radius:9px; background: {{ t.bg }}; border:1px solid #1d2228;">
+                  <span style="color: {{ t.iconColor }}; display:flex; flex:none;"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M1.5 4.2c0-.66.54-1.2 1.2-1.2h3.1c.4 0 .77.2.99.53l.6.9c.07.1.18.17.3.17h5.4c.66 0 1.2.54 1.2 1.2v6c0 .66-.54 1.2-1.2 1.2H2.7c-.66 0-1.2-.54-1.2-1.2V4.2z" fill="currentColor"/></svg></span>
+                  <div style="flex:1; min-width:0;">
+                    <input value="{{ t.name }}" onInput="{{ t.onName }}" readOnly="{{ t.locked }}" style="width:100%; background:transparent; border:none; color: {{ t.nameColor }}; font-size:13px; font-weight:500; font-family:'Geist Mono',monospace; font-style: {{ t.fontStyle }};" />
+                    <div style="font-size:11.5px; color:#6b7280; margin-top:1px;">{{ t.desc }}</div>
+                  </div>
+                  <sc-if value="{{ t.locked }}"><span style="font-size:11px; color:#525a64; flex:none;">🔒 locked</span></sc-if>
+                  <sc-if value="{{ t.removable }}"><span onClick="{{ t.onRemove }}" style="width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#6b7280; cursor:pointer; flex:none; font-size:14px;" style-hover="background:#20262e; color:#d96a6a;">✕</span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ onTaxoAdd }}" style="display:flex; align-items:center; gap:8px; padding:9px 13px; border-radius:8px; border:1px dashed #2c333d; background:transparent; color:#8c93a0; font-size:12.5px; font-weight:500; cursor:pointer; width:100%; justify-content:center;" style-hover="border-color:#3a424d; color:#cfd3d9;">＋ Add folder</button>
+          </sc-if>
+
+          <sc-if value="{{ setupS5 }}">
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:8px 0 4px;">
+              <div style="width:52px; height:52px; border-radius:14px; background:rgba(92,185,139,0.13); border:1px solid rgba(92,185,139,0.3); display:flex; align-items:center; justify-content:center; color:#5cb98b; font-size:24px; margin-bottom:18px;">✓</div>
+              <div style="font-size:21px; font-weight:600; color:#eceef1; margin-bottom:7px; letter-spacing:-0.2px;">You're all set</div>
+              <div style="color:#8c93a0; font-size:13px; margin-bottom:24px; max-width:380px;">Sortilege will create your tree, register a quiet startup task, and open the review queue.</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:1px; margin-bottom:24px; border-radius:10px; overflow:hidden; border:1px solid #1d2228;">
+              <div style="display:flex; justify-content:space-between; padding:11px 14px; background:#13161b; font-size:12.5px;"><span style="color:#8c93a0;">Destination</span><span style="color:#cdd6e6; font-family:'Geist Mono',monospace;">{{ setupName }}</span></div>
+              <div style="display:flex; justify-content:space-between; padding:11px 14px; background:#13161b; font-size:12.5px;"><span style="color:#8c93a0;">API key</span><span style="color:#5cb98b;">Connected ✓</span></div>
+              <div style="display:flex; justify-content:space-between; padding:11px 14px; background:#13161b; font-size:12.5px;"><span style="color:#8c93a0;">Top-level folders</span><span style="color:#cdd6e6;">{{ taxoCount }} categories</span></div>
+            </div>
+            <button onClick="{{ onFinishSetup }}" style="width:100%; padding:13px; border-radius:9px; border:none; background:var(--accent,#5b8cd6); color:#fff; font-weight:600; font-size:13.5px; cursor:pointer;" style-hover="filter:brightness(1.08);">Create folders &amp; start Sortilege</button>
+          </sc-if>
+
+          <sc-if value="{{ setupNav }}">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:26px; padding-top:20px; border-top:1px solid #1d2228;">
+              <button onClick="{{ onSetupBack }}" style="padding:9px 15px; border-radius:8px; border:1px solid #2a3038; background:transparent; color: {{ setupBackColor }}; font-weight:500; font-size:13px; cursor:pointer; visibility: {{ setupBackVis }};" style-hover="background:#171b21;">Back</button>
+              <button onClick="{{ onSetupNext }}" style="padding:9px 22px; border-radius:8px; border:none; background:var(--accent,#5b8cd6); color:#fff; font-weight:600; font-size:13px; cursor:pointer;" style-hover="filter:brightness(1.08);">Next</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+  <div style="flex:1; overflow-y:auto; display:{{ settingsDisplay }}; justify-content:center; align-items:flex-start; padding:42px 20px 60px;">
+      <div style="width:620px; max-width:100%;">
+        <div style="font-size:20px; font-weight:600; color:#eceef1; margin-bottom:4px; letter-spacing:-0.2px;">Settings</div>
+        <div style="color:#8c93a0; font-size:13px; margin-bottom:26px;">The defaults work. Adjust only what you need.</div>
+
+        <div style="background:#14171c; border:1px solid #232a32; border-radius:12px; padding:18px 20px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px;">
+            <div><div style="font-size:13.5px; color:#eceef1; font-weight:500; margin-bottom:3px;">Output destination</div><div style="font-family:'Geist Mono',monospace; font-size:12px; color:#8c93a0;">{{ setupName }}</div></div>
+            <button onClick="{{ onSettingsToast }}" style="padding:8px 14px; border-radius:7px; border:1px solid #2a3038; background:#171b21; color:#cfd3d9; font-size:12.5px; font-weight:500; cursor:pointer; flex:none;" style-hover="background:#1d222a;">Change…</button>
+          </div>
+        </div>
+
+        <div style="background:#14171c; border:1px solid #232a32; border-radius:12px; padding:18px 20px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px;">
+            <div><div style="font-size:13.5px; color:#eceef1; font-weight:500; margin-bottom:3px;">Claude API key</div><div style="font-family:'Geist Mono',monospace; font-size:12px; color:#8c93a0;">sk-ant-api03-••••••••••••••••3a9c</div></div>
+            <button onClick="{{ goSetup }}" style="padding:8px 14px; border-radius:7px; border:1px solid #2a3038; background:#171b21; color:#cfd3d9; font-size:12.5px; font-weight:500; cursor:pointer; flex:none;" style-hover="background:#1d222a;">Replace…</button>
+          </div>
+        </div>
+
+        <div style="background:#14171c; border:1px solid #232a32; border-radius:12px; padding:18px 20px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:15px;">
+            <div style="font-size:13.5px; color:#eceef1; font-weight:500;">Monthly cost ceiling</div>
+            <div style="display:flex; align-items:center; gap:6px; background:#0a0c10; border:1px solid #2a3038; border-radius:7px; padding:5px 11px;"><span style="color:#6b7280;">$</span><input value="{{ ceiling }}" onInput="{{ onCeiling }}" style="width:48px; background:transparent; border:none; color:#eceef1; font-size:13px; font-family:'Geist Mono',monospace; text-align:right;" /></div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; font-size:12px; margin-bottom:7px;"><span style="color:#8c93a0;">Current spend this month</span><span style="font-variant-numeric:tabular-nums; color: {{ spendColor }};">{{ spendLabel }}</span></div>
+          <div style="height:7px; border-radius:4px; background:#181c22; overflow:hidden;"><div style="height:100%; width: {{ spendPct }}; background: {{ spendColor }}; border-radius:4px;"></div></div>
+        </div>
+
+        <div style="background:#14171c; border:1px solid #232a32; border-radius:12px; padding:18px 20px; margin-bottom:22px;">
+          <div style="font-size:13.5px; color:#eceef1; font-weight:500; margin-bottom:4px;">Confidence thresholds</div>
+          <div style="font-size:11.5px; color:#7c828c; margin-bottom:15px; font-style:italic;">These are placeholders until calibrated on your first few batches.</div>
+          <div style="display:flex; flex-direction:column; gap:1px; border-radius:9px; overflow:hidden; border:1px solid #1d2228;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 13px; background:#13161b; font-size:12.5px;"><span style="color:#aeb4be;">Tier 2 — path &amp; filename heuristics</span><span style="font-family:'Geist Mono',monospace; color:#cdd6e6;">85%</span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 13px; background:#13161b; font-size:12.5px;"><span style="color:#aeb4be;">Tier 3 — content sniff</span><span style="font-family:'Geist Mono',monospace; color:#cdd6e6;">88%</span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 13px; background:#13161b; font-size:12.5px;"><span style="color:#aeb4be;">Tier 4 — Claude Haiku</span><span style="font-family:'Geist Mono',monospace; color:#cdd6e6;">90%</span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 13px; background:#13161b; font-size:12.5px;"><span style="color:#aeb4be;">Tier 5 — Claude Sonnet (deep)</span><span style="font-family:'Geist Mono',monospace; color:#cdd6e6;">92%</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end;">
+          <button onClick="{{ onSettingsToast }}" style="padding:10px 22px; border-radius:8px; border:none; background:var(--accent,#5b8cd6); color:#fff; font-weight:600; font-size:13px; cursor:pointer;" style-hover="filter:brightness(1.08);">Save</button>
+        </div>
+      </div>
+
+    <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; bottom:18px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; padding:11px 16px; border-radius:10px; background:#1a1f27; border:1px solid #2c333d; box-shadow:0 16px 40px rgba(0,0,0,0.45); z-index:7;">
+        <span style="display:flex; width:20px; height:20px; border-radius:50%; background:rgba(92,185,139,0.16); color:#5cb98b; align-items:center; justify-content:center; font-size:12px;">✓</span>
+        <span style="font-size:12.5px; color:#d7dbe0;">{{ toastText }}</span>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#5b8cd6&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;threshold&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:90,&quot;min&quot;:50,&quot;max&quot;:99,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;rootPath&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;E:\\organized&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  seedTree() {
+    const t = [];
+    const a = (id, name, depth, parent) => t.push({ id, name, depth, parent });
+    a('financial', 'financial', 0, null);
+    a('financial\\statements', 'statements', 1, 'financial');
+    a('financial\\statements\\2024', '2024', 2, 'financial\\statements');
+    a('financial\\invoices', 'invoices', 1, 'financial');
+    a('financial\\taxes', 'taxes', 1, 'financial');
+    a('career', 'career', 0, null);
+    a('career\\resumes', 'resumes', 1, 'career');
+    a('health', 'health', 0, null);
+    a('health\\insurance', 'insurance', 1, 'health');
+    a('documents', 'documents', 0, null);
+    a('documents\\contracts', 'contracts', 1, 'documents');
+    a('documents\\manuals', 'manuals', 1, 'documents');
+    a('photos', 'photos', 0, null);
+    a('photos\\vacation', 'vacation', 1, 'photos');
+    a('photos\\vacation\\japan', 'japan', 2, 'photos\\vacation');
+    a('photos\\phone', 'phone', 1, 'photos');
+    a('photos\\screenshots', 'screenshots', 1, 'photos');
+    a('media', 'media', 0, null);
+    a('media\\music', 'music', 1, 'media');
+    a('media\\music\\flac', 'flac', 2, 'media\\music');
+    a('media\\movies', 'movies', 1, 'media');
+    a('code', 'code', 0, null);
+    a('code\\projects', 'projects', 1, 'code');
+    a('code\\projects\\sortilege', 'sortilege', 2, 'code\\projects');
+    a('creative', 'creative', 0, null);
+    a('unsorted', 'unsorted', 0, null);
+    return t;
+  }
+
+  seedGroups() {
+    const F = (name, conf, size, modified, ext, tier, reasoning, source, thumb, dupeOf) =>
+      ({ name, conf, size, modified, ext, tier, reasoning, source, thumb, dupeOf });
+    const gs = [
+      { id: 'g1', dest: 'photos\\vacation\\japan', kind: 'normal', action: 'copy', count: 412, minConf: 91, files: [
+        F('IMG_4832.heic', 92, '3.4 MB', '2023-09-14', 'heic', 2, 'Matched photos\\vacation\\japan from EXIF GPS (35.68, 139.69 — central Tokyo) and the burst filename pattern IMG_48xx shared across 40 nearby frames.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image'),
+        F('IMG_4833.heic', 91, '3.2 MB', '2023-09-14', 'heic', 2, 'Same capture session as IMG_4832 — sequential filename, GPS within 80m, timestamp 4 seconds apart.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image'),
+        F('tokyo_tower.jpg', 94, '2.1 MB', '2023-09-15', 'jpg', 2, 'Filename token "tokyo" plus EXIF GPS inside the Tokyo bounding box. High agreement.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image'),
+        F('shibuya_night.jpg', 96, '4.8 MB', '2023-09-15', 'jpg', 2, 'Filename token "shibuya" + GPS match. Strongest signal in the cluster.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image'),
+        F('ramen_shop.jpg', 95, '2.6 MB', '2023-09-16', 'jpg', 2, 'GPS match and date contiguous with the japan burst window.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image'),
+        F('fushimi_inari.jpg', 97, '3.9 MB', '2023-09-17', 'jpg', 2, 'Filename token "fushimi" (Kyoto shrine) + GPS in Kyoto, same trip window.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image')
+      ] },
+      { id: 'g2', dest: 'financial\\statements\\2024', kind: 'normal', action: 'move', count: 184, minConf: 96, files: [
+        F('chase_checking_jan2024.pdf', 98, '240 KB', '2024-02-03', 'pdf', 4, 'PDF text layer matched a bank statement layout (account number masked, opening/closing balance, transaction table). Routed by year token 2024.', 'D:\\Downloads', 'pdf'),
+        F('amex_statement_2024-03.pdf', 97, '312 KB', '2024-04-02', 'pdf', 4, 'Card statement layout detected; issuer "American Express" in header.', 'D:\\Downloads', 'pdf'),
+        F('fidelity_q1_2024.pdf', 96, '1.1 MB', '2024-04-10', 'pdf', 4, 'Brokerage statement; quarterly period parsed to Q1 2024.', 'D:\\Downloads', 'pdf'),
+        F('savings_feb2024.pdf', 97, '198 KB', '2024-03-04', 'pdf', 4, 'Statement layout + savings account keywords; year token 2024.', 'D:\\Downloads', 'pdf')
+      ] },
+      { id: 'g3', dest: 'media\\music\\flac', kind: 'normal', action: 'move', count: 96, minConf: 94, files: [
+        F('01_intro.flac', 95, '38 MB', '2022-06-12', 'flac', 3, 'FLAC container sniffed from magic bytes; embedded Vorbis comments include album and track tags.', 'D:\\Downloads\\album_rip', 'audio'),
+        F('midnight_drive.flac', 94, '41 MB', '2022-06-12', 'flac', 3, 'Lossless audio container; ID3/Vorbis tags present.', 'D:\\Downloads\\album_rip', 'audio'),
+        F('closing_theme.flac', 96, '36 MB', '2022-06-12', 'flac', 3, 'Same album rip — consistent tags and bitrate.', 'D:\\Downloads\\album_rip', 'audio')
+      ] },
+      { id: 'g4', dest: 'career\\resumes', kind: 'normal', action: 'move', count: 38, minConf: 93, files: [
+        F('resume_2024_v3.docx', 96, '88 KB', '2024-01-20', 'docx', 4, 'Document structure matched a resume template (skills, experience, education sections) and the filename token "resume".', 'C:\\Users\\me\\Documents', 'doc'),
+        F('cover_letter_acme.docx', 93, '42 KB', '2024-02-11', 'docx', 4, 'Letter layout addressed to a company; clustered with resume by sibling proximity.', 'C:\\Users\\me\\Documents', 'doc'),
+        F('portfolio_brief.pdf', 95, '220 KB', '2023-12-02', 'pdf', 4, 'Career artifact; portfolio summary content.', 'C:\\Users\\me\\Documents', 'pdf')
+      ] },
+      { id: 'g5', dest: 'code\\projects\\sortilege', kind: 'normal', action: 'move', count: 64, minConf: 86, files: [
+        F('cascade.py', 88, '12 KB', '2025-11-02', 'py', 2, 'Path heuristic: located under a repo folder named "sortilege"; .py extension and import graph reference sibling modules.', 'C:\\dev\\sortilege', 'code'),
+        F('widget.pyw', 86, '9 KB', '2025-11-02', 'py', 2, 'Windowed Python entry; weaker signal because .pyw is uncommon — held for a glance.', 'C:\\dev\\sortilege', 'code'),
+        F('README.md', 92, '4 KB', '2025-10-28', 'md', 2, 'Markdown readme at repo root mentioning project name.', 'C:\\dev\\sortilege', 'doc'),
+        F('requirements.txt', 90, '1 KB', '2025-10-28', 'txt', 2, 'Dependency manifest adjacent to source files.', 'C:\\dev\\sortilege', 'doc')
+      ] },
+      { id: 'g6', dest: 'documents\\contracts', kind: 'normal', action: 'move', count: 53, minConf: 84, files: [
+        F('lease_2024_signed.pdf', 88, '420 KB', '2024-05-01', 'pdf', 4, 'Contract language detected — parties, term, and a signature block on the final page.', 'D:\\Downloads', 'pdf'),
+        F('nda_acme.pdf', 84, '180 KB', '2024-03-15', 'pdf', 4, 'NDA boilerplate matched, but no signature block — held in case it is a draft.', 'D:\\Downloads', 'pdf'),
+        F('freelance_msa.pdf', 90, '260 KB', '2024-02-20', 'pdf', 4, 'Master service agreement structure with defined terms section.', 'D:\\Downloads', 'pdf')
+      ] },
+      { id: 'g7', dest: 'documents\\manuals', kind: 'normal', action: 'move', count: 22, minConf: 74, files: [
+        F('dishwasher_manual.pdf', 81, '2.3 MB', '2021-08-12', 'pdf', 4, 'Product manual layout (numbered steps, parts diagram); brand "Bosch" detected in footer.', 'D:\\Downloads', 'pdf'),
+        F('router_setup_guide.pdf', 79, '1.8 MB', '2022-01-05', 'pdf', 4, 'Setup guide structure; networking terms. Below threshold — could also be documents root.', 'D:\\Downloads', 'pdf'),
+        F('warranty_card.pdf', 74, '96 KB', '2023-09-14', 'pdf', 5, 'Ambiguous — Sonnet weighed financial vs documents and chose manuals by sibling clustering with the appliance docs. Worth a look.', 'D:\\Downloads', 'pdf')
+      ] },
+      { id: 'g8', dest: 'health\\insurance', kind: 'normal', action: 'move', count: 14, minConf: 82, files: [
+        F('bcbs_eob_2024.pdf', 85, '140 KB', '2024-04-22', 'pdf', 4, 'Explanation of benefits layout; insurer "Blue Cross" in header.', 'D:\\Downloads', 'pdf'),
+        F('dental_plan_summary.pdf', 82, '210 KB', '2024-01-10', 'pdf', 4, 'Plan summary document; health insurance terms. Slightly below threshold.', 'D:\\Downloads', 'pdf')
+      ] },
+      { id: 'gd', dest: 'duplicate', kind: 'dupe', action: 'skip', count: 17, minConf: 100, files: [
+        F('IMG_4101.heic', null, '3.1 MB', '2023-07-02', 'heic', 2, 'Byte-identical hash to a file already filed. No action needed — confirming clears it from the queue.', 'C:\\Users\\me\\Pictures\\Camera Roll', 'image', 'photos\\phone\\IMG_4101.heic'),
+        F('invoice_2023.pdf', null, '88 KB', '2023-11-18', 'pdf', 2, 'Content hash matches a previously filed invoice.', 'D:\\Downloads', 'pdf', 'financial\\invoices\\invoice_2023.pdf'),
+        F('logo_final.png', null, '512 KB', '2024-02-01', 'png', 2, 'Identical to an asset already in creative\\brand.', 'D:\\Downloads', 'image', 'creative\\brand\\logo_final.png')
+      ] },
+      { id: 'ge', dest: 'error', kind: 'error', action: 'none', count: 3, minConf: 0, files: [
+        F('corrupt_archive.zip', null, '— ', '2024-06-01', 'zip', null, 'Unreadable — the ZIP central directory is damaged and could not be opened.', 'D:\\Downloads', 'error'),
+        F('locked_budget.xlsx', null, '44 KB', '2025-03-12', 'xlsx', null, 'Permission denied — the file is open in another application.', 'C:\\Users\\me\\Documents', 'error'),
+        F('scan_0098.tiff', null, '1.2 GB', '2020-02-09', 'tiff', null, 'Unsupported — the TIFF is larger than the inspection limit and was not decoded.', 'E:\\scans', 'error')
+      ] }
+    ];
+    return gs;
+  }
+
+  indexGroups(gs) {
+    gs.forEach(g => g.files.forEach((f, i) => { f.id = g.id + '-' + i; if (f.dest === undefined) f.dest = (g.kind === 'normal' ? g.dest : '—'); }));
+    return gs;
+  }
+
+  state = {
+    screen: 'review',
+    treeWidth: 282,
+    expandedFolders: { financial: true, 'financial\\statements': true, photos: true, 'photos\\vacation': true, documents: true, code: true, 'code\\projects': true, media: true, 'media\\music': true },
+    expandedGroups: {},
+    checkedGroups: {},
+    checkedFiles: {},
+    selectedFileId: null,
+    dragOverFolder: null,
+    draggingFileIds: [],
+    hoveredNode: null,
+    banner: null,
+    processing: 0,
+    progressPct: 0,
+    toast: null,
+    undoBatches: [],
+    heldOnly: false,
+    sortDir: 'desc',
+    dismissed: {},
+    removed: {},
+    newFolderParent: null,
+    newFolderName: '',
+    renameSug: null,
+    renameVal: '',
+    suggestions: [
+      { id: 's1', kind: 'create', kindLabel: 'Suggest creating:', target: 'financial\\taxes\\2023', note: '— would receive 38 held files', canRename: true },
+      { id: 's2', kind: 'rule', kindLabel: 'Suggest rule:', target: '*.heic from "Camera Roll" \u2192 photos\\phone', note: '(8 matching corrections)', canRename: false }
+    ],
+    setupStep: 1,
+    setupName: 'E:\\organized',
+    apiKey: '',
+    apiState: 'idle',
+    onedrivePolicy: 'hydrate',
+    taxo: [
+      { name: 'financial', desc: 'Bank statements, taxes, invoices, receipts' },
+      { name: 'career', desc: 'Resumes, offers, reviews, work samples' },
+      { name: 'health', desc: 'Insurance, records, prescriptions' },
+      { name: 'documents', desc: 'Contracts, manuals, official paperwork' },
+      { name: 'photos', desc: 'Personal photos and screenshots' },
+      { name: 'media', desc: 'Music, movies, downloaded media' },
+      { name: 'code', desc: 'Source repositories and snippets' },
+      { name: 'creative', desc: 'Design files, drafts, assets' },
+      { name: 'unsorted', desc: 'Fallback for unclassifiable files', locked: true }
+    ],
+    ceiling: '10.00',
+    groups: this.indexGroups(this.seedGroups()),
+    tree: this.seedTree()
+  };
+
+  th() { return this.props.threshold || 90; }
+  accent() { return this.props.accentColor || '#5b8cd6'; }
+  rootPath() { return this.props.rootPath || 'E:\\organized'; }
+
+  // ---- helpers
+  timeAgo(t) {
+    const s = Math.floor((Date.now() - t) / 1000);
+    if (s < 30) return 'just now';
+    if (s < 90) return '1 min ago';
+    if (s < 3600) return Math.floor(s / 60) + ' min ago';
+    return Math.floor(s / 3600) + ' hr ago';
+  }
+  folderCount(path) {
+    let n = 0;
+    for (const g of this.state.groups) {
+      if (g.kind !== 'normal' || this.state.removed[g.id]) continue;
+      if (g.dest === path || g.dest.indexOf(path + '\\') === 0) n += g.count;
+    }
+    return n;
+  }
+  liveGroups() { return this.state.groups.filter(g => !this.state.removed[g.id]); }
+
+  // ---- review interactions
+  toggleFolder(id) { this.setState(s => ({ expandedFolders: { ...s.expandedFolders, [id]: !s.expandedFolders[id] } })); }
+  toggleGroup(id) { this.setState(s => ({ expandedGroups: { ...s.expandedGroups, [id]: !s.expandedGroups[id] } })); }
+  toggleCheckGroup(id, e) { if (e) e.stopPropagation(); this.setState(s => ({ checkedGroups: { ...s.checkedGroups, [id]: !s.checkedGroups[id] } })); }
+  toggleCheckFile(id, e) { if (e) e.stopPropagation(); this.setState(s => ({ checkedFiles: { ...s.checkedFiles, [id]: !s.checkedFiles[id] } })); }
+
+  startDragFile(e, id) {
+    const checked = Object.keys(this.state.checkedFiles).filter(k => this.state.checkedFiles[k]);
+    const ids = checked.indexOf(id) >= 0 ? checked : [id];
+    this.setState({ draggingFileIds: ids });
+    if (e && e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', ids.join(',')); } catch (_) {} }
+  }
+  onDropFolder(path) {
+    const ids = this.state.draggingFileIds;
+    if (!ids.length) { this.setState({ dragOverFolder: null }); return; }
+    this.reassignFiles(ids, path);
+    this.setState({ dragOverFolder: null, draggingFileIds: [], toast: { text: (ids.length > 1 ? ids.length + ' files' : '1 file') + ' re-routed to ' + path, batchId: null } });
+  }
+  reassignFiles(ids, dest) {
+    const groups = this.state.groups.map(g => ({ ...g, files: g.files.slice() }));
+    const moved = [];
+    ids.forEach(id => {
+      for (const g of groups) {
+        const i = g.files.findIndex(f => f.id === id);
+        if (i >= 0) { const f = g.files[i]; g.files.splice(i, 1); g.count = Math.max(0, g.count - 1); moved.push(f); break; }
+      }
+    });
+    if (!moved.length) return;
+    let target = groups.find(g => g.kind === 'normal' && g.dest === dest && !this.state.removed[g.id]);
+    if (!target) { target = { id: 'gx-' + Date.now(), dest, kind: 'normal', action: 'move', count: 0, minConf: 100, files: [] }; groups.push(target); }
+    moved.forEach(f => { f.dest = dest; f.conf = Math.max(f.conf || 0, 96); f.reasoning = 'Manually re-routed by you — treated as a high-confidence correction and logged for future rules.'; f.tier = 1; target.files.push(f); target.count += 1; });
+    groups.forEach(g => { if (g.kind === 'normal' && g.files.length) g.minConf = Math.min(g.minConf, Math.min.apply(null, g.files.map(f => f.conf || 100))); });
+    const ng = groups.filter(g => g.count > 0);
+    this.setState({ groups: ng, selectedFileId: null, checkedFiles: {} });
+  }
+
+  selectHighConf() {
+    const c = {}; const th = this.th();
+    this.liveGroups().forEach(g => { if (g.kind === 'normal' && g.minConf >= th) c[g.id] = true; });
+    this.setState({ checkedGroups: c });
+  }
+  confirmSelected() {
+    const ids = Object.keys(this.state.checkedGroups).filter(k => this.state.checkedGroups[k] && !this.state.removed[k]);
+    if (!ids.length) return;
+    let move = 0, copy = 0, dupe = 0;
+    ids.forEach(id => { const g = this.state.groups.find(x => x.id === id); if (!g) return; if (g.kind === 'dupe') dupe += g.count; else if (g.action === 'copy') copy += g.count; else move += g.count; });
+    this.setState({ banner: { ids, move, copy, dupe } });
+  }
+  proceed() { if (this.state.banner) this.confirmGroups(this.state.banner.ids); }
+  confirmGroups(ids) {
+    const groups = this.state.groups.filter(g => ids.indexOf(g.id) >= 0 && !this.state.removed[g.id]);
+    if (!groups.length) return;
+    const total = groups.reduce((a, g) => a + g.count, 0);
+    const batch = { id: 'b' + Date.now(), ids: ids.slice(), total, time: Date.now() };
+    const removed = { ...this.state.removed }; ids.forEach(id => removed[id] = true);
+    const checked = { ...this.state.checkedGroups }; ids.forEach(id => delete checked[id]);
+    this.setState({ removed, checkedGroups: checked, banner: null, processing: 1, progressPct: 0, toast: null });
+    let p = 0;
+    const timer = setInterval(() => {
+      p += 13 + Math.random() * 16;
+      if (p >= 100) { clearInterval(timer); this.setState({ progressPct: '100%' });
+        setTimeout(() => this.setState(s => ({ processing: 0, undoBatches: [batch, ...s.undoBatches], toast: { text: 'Batch confirmed — ' + total.toLocaleString() + ' files processed.', batchId: batch.id } })), 200);
+      } else this.setState({ progressPct: Math.round(p) + '%' });
+    }, 65);
+  }
+  undo(batchId) {
+    const b = batchId ? this.state.undoBatches.find(x => x.id === batchId) : this.state.undoBatches[0];
+    if (!b) return;
+    const removed = { ...this.state.removed }; b.ids.forEach(id => delete removed[id]);
+    this.setState(s => ({ removed, undoBatches: s.undoBatches.filter(x => x.id !== b.id), toast: { text: b.total.toLocaleString() + ' files returned to the queue.', batchId: null } }));
+  }
+
+  startNewFolder(parent, e) { if (e) e.stopPropagation(); this.setState(s => ({ newFolderParent: parent, newFolderName: '', expandedFolders: { ...s.expandedFolders, [parent]: true } })); }
+  commitNewFolder(parent) {
+    const name = (this.state.newFolderName || '').trim();
+    if (!name) { this.setState({ newFolderParent: null, newFolderName: '' }); return; }
+    const pnode = this.state.tree.find(x => x.id === parent);
+    const id = parent + '\\' + name;
+    if (this.state.tree.some(x => x.id === id)) { this.setState({ newFolderParent: null, newFolderName: '' }); return; }
+    const node = { id, name, depth: pnode.depth + 1, parent };
+    this.setState(s => ({ tree: [...s.tree, node], newFolderParent: null, newFolderName: '', toast: { text: 'Folder created — ' + id + '. Held files recalculated.', batchId: null } }));
+  }
+
+  acceptSuggestion(id) {
+    if (id === 's1') {
+      const exists = this.state.tree.some(x => x.id === 'financial\\taxes\\2023');
+      const tree = exists ? this.state.tree : [...this.state.tree, { id: 'financial\\taxes\\2023', name: '2023', depth: 2, parent: 'financial\\taxes' }];
+      this.setState(s => ({ tree, dismissed: { ...s.dismissed, s1: true }, expandedFolders: { ...s.expandedFolders, financial: true, 'financial\\taxes': true }, toast: { text: 'Created financial\\taxes\\2023 — 38 held files re-routed.', batchId: null } }));
+    } else {
+      this.setState(s => ({ dismissed: { ...s.dismissed, s2: true }, toast: { text: 'Rule saved — applied to 8 matching files.', batchId: null } }));
+    }
+  }
+  dismissSuggestion(id) { this.setState(s => ({ dismissed: { ...s.dismissed, [id]: true } })); }
+  startRename(id) { const s = this.state.suggestions.find(x => x.id === id); this.setState({ renameSug: id, renameVal: s ? s.target : '' }); }
+  commitRename(id) {
+    const v = (this.state.renameVal || '').trim();
+    this.setState(s => ({ suggestions: s.suggestions.map(x => x.id === id ? { ...x, target: v || x.target } : x), renameSug: null }));
+  }
+
+  onStartResize(e) {
+    e.preventDefault();
+    const startX = e.clientX, startW = this.state.treeWidth;
+    const move = ev => { let w = startW + (ev.clientX - startX); w = Math.max(216, Math.min(440, w)); this.setState({ treeWidth: w }); };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); document.body.style.cursor = ''; document.body.style.userSelect = ''; };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+    document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none';
+  }
+
+  // ---- setup
+  setupNext() { if (this.state.setupStep < 5) this.setState(s => ({ setupStep: s.setupStep + 1 })); }
+  setupBack() { if (this.state.setupStep > 1) this.setState(s => ({ setupStep: s.setupStep - 1 })); }
+  setupGoto(n) { this.setState({ setupStep: n }); }
+  onApiInput(e) {
+    const v = e.target.value;
+    this.setState({ apiKey: v, apiState: v.length ? 'checking' : 'idle' });
+    if (this._apiT) clearTimeout(this._apiT);
+    if (v.length) this._apiT = setTimeout(() => this.setState({ apiState: v.trim().length >= 16 ? 'valid' : 'invalid' }), 650);
+  }
+  finishSetup() { this.setState({ screen: 'review', toast: { text: 'Sortilege is running — drag files onto its window to begin.', batchId: null } }); }
+
+  // ---- decorate
+  buildTree() {
+    const t = this.state.tree;
+    const out = [];
+    const accent = this.accent();
+    const walk = parent => {
+      t.filter(n => n.parent === parent).forEach(n => {
+        const hasKids = t.some(c => c.parent === n.id);
+        const expanded = !!this.state.expandedFolders[n.id];
+        const cnt = this.folderCount(n.id);
+        const over = this.state.dragOverFolder === n.id;
+        const hov = this.state.hoveredNode === n.id;
+        const isUns = n.id === 'unsorted';
+        out.push({
+          isNode: true, isInput: false, id: n.id, name: n.name, depth: n.depth,
+          padLeft: (8 + n.depth * 15) + 'px',
+          chevron: hasKids ? (expanded ? '\u25be' : '\u25b8') : '',
+          count: cnt ? cnt.toLocaleString() : '',
+          nameColor: isUns ? '#5f6772' : '#cbd0d7',
+          iconColor: isUns ? '#454c56' : (over ? accent : '#7d8590'),
+          fontStyle: isUns ? 'italic' : 'normal',
+          bg: over ? 'rgba(91,140,214,0.16)' : 'transparent',
+          ring: over ? ('inset 0 0 0 1px ' + accent) : 'none',
+          addOpacity: hov ? '1' : '0',
+          onToggle: () => { if (hasKids) this.toggleFolder(n.id); },
+          onEnter: () => this.setState({ hoveredNode: n.id }),
+          onLeave: () => this.setState(s => s.hoveredNode === n.id ? { hoveredNode: null } : null),
+          onDragOver: e => { e.preventDefault(); if (this.state.dragOverFolder !== n.id) this.setState({ dragOverFolder: n.id }); },
+          onDragLeave: () => { if (this.state.dragOverFolder === n.id) this.setState({ dragOverFolder: null }); },
+          onDrop: e => { e.preventDefault(); this.onDropFolder(n.id); },
+          onAddFolder: e => this.startNewFolder(n.id, e)
+        });
+        if (this.state.newFolderParent === n.id) {
+          out.push({ isNode: false, isInput: true, id: n.id + '-newinput', padLeft: (8 + (n.depth + 1) * 15) + 'px', value: this.state.newFolderName,
+            onInput: e => this.setState({ newFolderName: e.target.value }),
+            onKeyDown: e => { if (e.key === 'Enter') this.commitNewFolder(n.id); else if (e.key === 'Escape') this.setState({ newFolderParent: null, newFolderName: '' }); },
+            onCancel: () => this.setState({ newFolderParent: null, newFolderName: '' }) });
+        }
+        if (hasKids && expanded) walk(n.id);
+      });
+    };
+    walk(null);
+    return out;
+  }
+
+  confColor(c) { if (c == null) return '#6b7280'; if (c < 70) return '#d96a6a'; if (c < this.th()) return '#d9a441'; return '#5cb98b'; }
+
+  decorateFile(f, g) {
+    const accent = this.accent();
+    const checked = !!this.state.checkedFiles[f.id];
+    return {
+      isFile: true, isMore: false, id: f.id, name: f.name,
+      confLabel: f.conf == null ? '\u2014' : f.conf + '%',
+      confColor: this.confColor(f.conf),
+      dest: g.kind === 'normal' ? f.dest : (g.kind === 'dupe' ? 'skip' : '\u2014'),
+      size: f.size, modified: f.modified,
+      opacity: (this.state.draggingFileIds.indexOf(f.id) >= 0) ? '0.4' : '1',
+      checkBorder: checked ? accent : '#3a414b',
+      checkBg: checked ? accent : 'transparent',
+      checkMark: checked ? '\u2713' : '',
+      onClick: () => this.setState({ selectedFileId: f.id }),
+      onToggleCheck: e => this.toggleCheckFile(f.id, e),
+      onDragStart: e => this.startDragFile(e, f.id),
+      onDragEnd: () => this.setState({ draggingFileIds: [] })
+    };
+  }
+
+  decorateGroup(g) {
+    const th = this.th(), accent = this.accent();
+    const below = g.minConf < th;
+    const groupAccent = g.kind === 'error' ? '#d96a6a' : g.kind === 'dupe' ? '#5a626d' : (below ? '#d9a441' : '#5cb98b');
+    const expanded = !!this.state.expandedGroups[g.id];
+    const checked = !!this.state.checkedGroups[g.id];
+    let files = [];
+    if (expanded) {
+      files = g.files.map(f => this.decorateFile(f, g));
+      if (g.count > g.files.length) files.push({ isFile: false, isMore: true, id: g.id + '-more', label: '+ ' + (g.count - g.files.length).toLocaleString() + ' more files in this group', onClick: () => {} });
+    }
+    const dest = g.kind === 'dupe' ? 'dupe \u2014 already filed' : g.kind === 'error' ? 'error \u2014 unreadable' : g.dest;
+    let confirmBg = accent, confirmColor = '#fff', confirmBorder = 'transparent', confirmLabel = 'Confirm';
+    if (g.kind === 'dupe') { confirmBg = 'transparent'; confirmColor = '#9aa0aa'; confirmBorder = '#2e353f'; confirmLabel = 'Acknowledge'; }
+    return {
+      id: g.id, isError: g.kind === 'error', rowBg: g.kind === 'dupe' ? '#101216' : (g.kind === 'error' ? '#15100f' : '#14171c'),
+      accent: groupAccent,
+      showCheck: g.kind !== 'error',
+      checkBorder: checked ? accent : '#3a414b', checkBg: checked ? accent : 'transparent', checkMark: checked ? '\u2713' : '',
+      countLabel: g.count.toLocaleString() + ' files',
+      dest, destColor: g.kind === 'normal' ? '#bcc4d0' : '#7c828c',
+      showConf: g.kind === 'normal', confLabel: g.kind === 'normal' ? ('min confidence ' + g.minConf + '%') : (g.kind === 'dupe' ? 'no action needed' : 'needs attention'),
+      softLabel: g.kind !== 'normal',
+      expanded, chevron: expanded ? '\u25be' : '\u25b8',
+      showConfirm: g.kind !== 'error',
+      confirmBg, confirmColor, confirmBorder, confirmLabel,
+      onToggleExpand: () => this.toggleGroup(g.id),
+      onToggleCheck: e => this.toggleCheckGroup(g.id, e),
+      onConfirm: e => { if (e) e.stopPropagation(); this.confirmGroups([g.id]); },
+      files
+    };
+  }
+
+  buildGroups() {
+    const th = this.th();
+    let gs = this.liveGroups();
+    if (this.state.heldOnly) gs = gs.filter(g => g.kind === 'error' || (g.kind === 'normal' && g.minConf < th));
+    const rank = g => g.kind === 'error' ? 4 : g.kind === 'dupe' ? 3 : (g.minConf < th ? 2 : 1);
+    const dir = this.state.sortDir === 'desc' ? -1 : 1;
+    gs = gs.slice().sort((a, b) => { const ra = rank(a), rb = rank(b); if (ra !== rb) return ra - rb; return (a.minConf - b.minConf) * dir; });
+    return gs.map(g => this.decorateGroup(g));
+  }
+
+  buildSuggestions() {
+    return this.state.suggestions.filter(s => !this.state.dismissed[s.id]).map(s => ({
+      id: s.id, kindLabel: s.kindLabel, target: s.target, note: s.note, canRename: !!s.canRename,
+      renaming: this.state.renameSug === s.id, renameVal: this.state.renameVal,
+      onAccept: () => this.acceptSuggestion(s.id),
+      onDismiss: () => this.dismissSuggestion(s.id),
+      onRename: () => this.startRename(s.id),
+      onRenameInput: e => this.setState({ renameVal: e.target.value }),
+      onRenameKey: e => { if (e.key === 'Enter') this.commitRename(s.id); else if (e.key === 'Escape') this.setState({ renameSug: null }); },
+      onRenameCommit: () => this.commitRename(s.id),
+      onRenameCancel: () => this.setState({ renameSug: null })
+    }));
+  }
+
+  buildDetail() {
+    if (!this.state.selectedFileId) return null;
+    let f = null, g = null;
+    for (const gr of this.state.groups) { const ff = gr.files.find(x => x.id === this.state.selectedFileId); if (ff) { f = ff; g = gr; break; } }
+    if (!f) return null;
+    const accent = this.accent();
+    const thumbMap = {
+      image: { bg: 'linear-gradient(135deg,#2a3a4f,#46607e 60%,#7d93a8)', ink: '#eaf1f8', tag: 'image preview' },
+      pdf: { bg: 'linear-gradient(135deg,#3a2326,#5a2f33)', ink: '#f3d9da', tag: 'PDF \u2014 page 1' },
+      doc: { bg: 'linear-gradient(135deg,#23303f,#2f4257)', ink: '#dbe6f1', tag: 'document' },
+      audio: { bg: 'linear-gradient(135deg,#2a2440,#3d3460)', ink: '#e4ddf5', tag: 'audio' },
+      error: { bg: 'linear-gradient(135deg,#3a201f,#532b29)', ink: '#f0cfcd', tag: 'unreadable' }
+    };
+    const tm = thumbMap[f.thumb] || thumbMap.doc;
+    const tierMeaning = { 1: 'Manual correction', 2: 'Path & filename heuristics', 3: 'Content sniff', 4: 'Claude Haiku', 5: 'Claude Sonnet (deep)' };
+    return {
+      name: f.name,
+      metaLine: '.' + (f.ext || '') + '  \u00b7  ' + f.size + '  \u00b7  modified ' + f.modified,
+      thumbBg: tm.bg, thumbInk: tm.ink, thumbLabel: '.' + (f.ext || 'file'), thumbTag: tm.tag,
+      tierBadge: f.tier ? ('Tier ' + f.tier) : 'No tier', tierMeaning: tierMeaning[f.tier] || 'Failed before classification',
+      confPct: (f.conf || 0) + '%', confColor: this.confColor(f.conf), confLabel: f.conf == null ? 'n/a' : f.conf + '%',
+      reasoning: f.reasoning,
+      isDupe: !!f.dupeOf, dupeOf: f.dupeOf || '',
+      source: f.source, dest: g.kind === 'normal' ? f.dest : (g.kind === 'dupe' ? 'skipped (duplicate)' : 'held \u2014 error'),
+      onClose: () => this.setState({ selectedFileId: null })
+    };
+  }
+
+  buildSetupSteps() {
+    const labels = ['Destination', 'API key', 'Environment', 'Taxonomy', 'Finish'];
+    const cur = this.state.setupStep, accent = this.accent();
+    return labels.map((label, i) => {
+      const num = i + 1; const done = num < cur, active = num === cur;
+      return {
+        label, mark: done ? '\u2713' : String(num),
+        dotBg: done ? accent : active ? 'rgba(91,140,214,0.14)' : '#14171c',
+        dotColor: done ? '#fff' : active ? accent : '#5c636e',
+        dotBorder: done ? accent : active ? accent : '#2a3038',
+        labelColor: active ? '#eceef1' : done ? '#aeb4be' : '#5c636e',
+        connector: done ? accent : '#222830',
+        onClick: () => this.setupGoto(num)
+      };
+    });
+  }
+
+  buildTaxo() {
+    return this.state.taxo.map((t, i) => ({
+      name: t.name, desc: t.desc, locked: !!t.locked, removable: !t.locked,
+      bg: t.locked ? '#101216' : '#13161b',
+      iconColor: t.locked ? '#454c56' : '#7d8590',
+      nameColor: t.locked ? '#6b7280' : '#dbe1e8',
+      fontStyle: t.locked ? 'italic' : 'normal',
+      onName: e => { const v = e.target.value; this.setState(s => ({ taxo: s.taxo.map((x, j) => j === i ? { ...x, name: v } : x) })); },
+      onRemove: () => this.setState(s => ({ taxo: s.taxo.filter((x, j) => j !== i) }))
+    }));
+  }
+
+  renderVals() {
+    const s = this.state, accent = this.accent(), th = this.th();
+    const isReview = s.screen === 'review', isSetup = s.screen === 'setup', isSettings = s.screen === 'settings';
+    const groups = isReview ? this.buildGroups() : [];
+    const live = this.liveGroups();
+    const totalQueue = live.reduce((a, g) => a + g.count, 0);
+    const heldCount = live.filter(g => g.kind === 'error' || (g.kind === 'normal' && g.minConf < th)).reduce((a, g) => a + g.count, 0);
+    const checkedCount = Object.keys(s.checkedGroups).filter(k => s.checkedGroups[k] && !s.removed[k]).length;
+    const undo0 = s.undoBatches[0];
+    const banner = s.banner;
+    let bannerLine = '';
+    if (banner) {
+      const parts = [];
+      if (banner.move) parts.push('Move ' + banner.move.toLocaleString() + ' files');
+      if (banner.copy) parts.push('copy ' + banner.copy.toLocaleString() + ' files');
+      if (banner.dupe) parts.push('acknowledge ' + banner.dupe.toLocaleString() + ' dupes');
+      bannerLine = parts.join(', ') + '.';
+    }
+    const tab = (on) => on ? '#1c222b' : 'transparent';
+    const tabC = (on) => on ? '#eceef1' : '#9aa0aa';
+    const ceilNum = parseFloat(s.ceiling) || 0; const spend = 6.42;
+    const spendOver = spend >= ceilNum && ceilNum > 0;
+    const apiMsgMap = {
+      idle: { msg: '', color: '#6b7280', icon: '', border: '#2a3038' },
+      checking: { msg: 'Checking key\u2026', color: '#8c93a0', icon: '\u25cc', border: '#2a3038' },
+      valid: { msg: 'Connected \u2014 key is valid.', color: '#5cb98b', icon: '\u2713', border: 'rgba(92,185,139,0.5)' },
+      invalid: { msg: 'Invalid key \u2014 check for typos.', color: '#d96a6a', icon: '\u2715', border: 'rgba(217,106,106,0.5)' }
+    };
+    const api = apiMsgMap[s.apiState] || apiMsgMap.idle;
+    const pol = s.onedrivePolicy;
+
+    return {
+      accentVar: accent,
+      isReview, isSetup, isSettings,
+      reviewDisplay: isReview ? 'flex' : 'none',
+      setupDisplay: isSetup ? 'flex' : 'none',
+      settingsDisplay: isSettings ? 'flex' : 'none',
+      goReview: () => this.setState({ screen: 'review' }),
+      goSetup: () => this.setState({ screen: 'setup' }),
+      goSettings: () => this.setState({ screen: 'settings' }),
+      reviewTabBg: tab(isReview), reviewTabColor: tabC(isReview),
+      setupTabBg: tab(isSetup), setupTabColor: tabC(isSetup),
+      settingsTabBg: tab(isSettings), settingsTabColor: tabC(isSettings),
+      heldBadge: heldCount.toLocaleString(),
+      navStatus: totalQueue.toLocaleString() + ' files in queue',
+
+      treeWidthPx: s.treeWidth + 'px',
+      treeNodes: this.buildTree(),
+      summaryLine: this.rootPath() + '\\  \u2014  ' + totalQueue.toLocaleString() + ' files  \u2014  14.3 GB',
+      onStartResize: e => this.onStartResize(e),
+
+      onSelectHighConf: () => this.selectHighConf(),
+      onConfirmSelected: () => this.confirmSelected(),
+      confirmSelectedLabel: checkedCount ? ('Confirm selected (' + checkedCount + ')') : 'Confirm selected',
+      confirmSelectedBg: checkedCount ? accent : '#171b21',
+      confirmSelectedColor: checkedCount ? '#fff' : '#5c636e',
+      confirmSelectedCursor: checkedCount ? 'pointer' : 'default',
+      hasUndo: !!undo0,
+      onUndo: () => this.undo(),
+      undoLabel: undo0 ? ('Undo ' + undo0.total.toLocaleString() + ' files \u00b7 ' + this.timeAgo(undo0.time)) : '',
+      onToggleHeldOnly: () => this.setState(st => ({ heldOnly: !st.heldOnly })),
+      heldFilterLabel: s.heldOnly ? 'Held only' : 'All groups',
+      heldFilterBg: s.heldOnly ? 'rgba(217,164,65,0.12)' : '#171b21',
+      heldFilterBorder: s.heldOnly ? 'rgba(217,164,65,0.4)' : '#2a3038',
+      heldFilterColor: s.heldOnly ? '#d9a441' : '#aeb4be',
+      onToggleSort: () => this.setState(st => ({ sortDir: st.sortDir === 'desc' ? 'asc' : 'desc' })),
+      sortLabel: s.sortDir === 'desc' ? 'Confidence \u2193' : 'Confidence \u2191',
+
+      showProgress: s.processing === 1,
+      progressPct: s.progressPct || '0%',
+      progressLabel: (s.progressPct || '0%'),
+
+      showBanner: !!banner, bannerLine,
+      onProceed: () => this.proceed(), onCancelBanner: () => this.setState({ banner: null }),
+
+      hasSuggestions: isReview && this.buildSuggestions().length > 0,
+      suggestions: this.buildSuggestions(),
+
+      groups,
+      queueEmpty: isReview && groups.length === 0,
+
+      showToast: !!s.toast, toastText: s.toast ? s.toast.text : '',
+      toastHasUndo: !!(s.toast && s.toast.batchId),
+      onToastUndo: () => { if (s.toast && s.toast.batchId) this.undo(s.toast.batchId); },
+
+      showDetail: isReview && !!this.buildDetail(),
+      detail: this.buildDetail(),
+
+      // setup
+      setupSteps: this.buildSetupSteps(),
+      setupS1: s.setupStep === 1, setupS2: s.setupStep === 2, setupS3: s.setupStep === 3, setupS4: s.setupStep === 4, setupS5: s.setupStep === 5,
+      setupNav: s.setupStep < 5,
+      setupName: s.setupName, onSetupName: e => this.setState({ setupName: e.target.value }),
+      onSetupNext: () => this.setupNext(), onSetupBack: () => this.setupBack(),
+      setupBackVis: s.setupStep > 1 ? 'visible' : 'hidden', setupBackColor: '#aeb4be',
+      apiKey: s.apiKey, onApiInput: e => this.onApiInput(e),
+      apiBorder: api.border, apiIcon: api.icon, apiMsg: api.msg, apiMsgColor: api.color,
+      onPolicyHydrate: () => this.setState({ onedrivePolicy: 'hydrate' }),
+      onPolicySkip: () => this.setState({ onedrivePolicy: 'skip' }),
+      policyHydrateBg: pol === 'hydrate' ? 'rgba(91,140,214,0.08)' : 'transparent',
+      policyHydrateBorder: pol === 'hydrate' ? accent : '#3a414b',
+      policyHydrateDot: pol === 'hydrate' ? accent : 'transparent',
+      policySkipBg: pol === 'skip' ? 'rgba(91,140,214,0.08)' : 'transparent',
+      policySkipBorder: pol === 'skip' ? accent : '#3a414b',
+      policySkipDot: pol === 'skip' ? accent : 'transparent',
+      taxoRows: this.buildTaxo(), taxoCount: s.taxo.length,
+      onTaxoAdd: () => this.setState(st => ({ taxo: [...st.taxo.slice(0, st.taxo.length - 1), { name: 'new_folder', desc: 'Describe this category' }, st.taxo[st.taxo.length - 1]] })),
+      onFinishSetup: () => this.finishSetup(),
+
+      // settings
+      ceiling: s.ceiling, onCeiling: e => this.setState({ ceiling: e.target.value }),
+      spendLabel: '$' + spend.toFixed(2) + ' of $' + (ceilNum.toFixed(2)),
+      spendPct: Math.min(100, ceilNum ? (spend / ceilNum * 100) : 0) + '%',
+      spendColor: spendOver ? '#d9a441' : accent,
+      onSettingsToast: () => this.setState({ toast: { text: 'Settings saved.', batchId: null } })
+    };
+  }
+}
+</script>
+</body>
+</html>

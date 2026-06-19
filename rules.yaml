@@ -1,0 +1,74 @@
+# Tier 2 deterministic rules — checked in list order, first match wins.
+# Fields within `match` are AND'd.
+# Signal priority by convention: exif rules first, then filename patterns, then extension-only.
+# Accepted rule proposals from the UI are appended here.
+#
+# Match fields:
+#   has_exif: true           — file has EXIF Make or Model tag (camera shot)
+#   has_gps: true            — file has EXIF GPS coordinates
+#   exif_make: "Apple"       — specific EXIF Make value; "*" = any value present
+#   filename_pattern: "*.x"  — fnmatch glob against filename only (case-insensitive)
+#   extension: "pdf"         — file extension without dot; list form also accepted
+#
+# destination: taxonomy_node.rel_path value (backslashes for deeper paths, e.g. "financial\\taxes")
+# confidence: float 0–1, checked against tier2_rules_min in config
+
+rules:
+  - name: camera_photo_exif
+    match:
+      has_exif: true
+    destination: "photos"
+    confidence: 0.95
+
+  - name: iphone_heic
+    match:
+      filename_pattern: "IMG_*.heic"
+    destination: "photos"
+    confidence: 0.92
+
+  - name: iphone_jpg
+    match:
+      filename_pattern: "IMG_*.jpg"
+    destination: "photos"
+    confidence: 0.88
+
+  - name: screenshot_png
+    match:
+      filename_pattern: "Screenshot*"
+      extension: "png"
+    destination: "media"
+    confidence: 0.90
+
+  - name: screenshot_jpg
+    match:
+      filename_pattern: "Screenshot*"
+      extension: "jpg"
+    destination: "media"
+    confidence: 0.88
+
+  - name: bank_statement
+    match:
+      filename_pattern: "*statement*"
+      extension: "pdf"
+    destination: "financial"
+    confidence: 0.88
+
+  - name: tax_document
+    match:
+      filename_pattern: "*tax*"
+      extension: "pdf"
+    destination: "financial"
+    confidence: 0.85
+
+  - name: resume
+    match:
+      filename_pattern: "*resume*"
+      extension: ["pdf", "docx"]
+    destination: "career"
+    confidence: 0.88
+
+  - name: source_code
+    match:
+      extension: ["py", "js", "ts", "jsx", "tsx", "go", "rs", "java", "cpp", "c", "h", "cs", "rb", "php", "swift", "kt"]
+    destination: "code"
+    confidence: 0.85
