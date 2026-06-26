@@ -432,6 +432,30 @@ captured → queued → classifying → held ←──────────�
 
 **Optional optimization (not v1):** Anthropic's Batch API is 50% cheaper, suited to large non-interactive passes (the initial corpus). Regular API for daily drops.
 
+### Alternative LLM Backends (not v1)
+
+The current implementation uses the `anthropic` Python SDK, which speaks Anthropic's native `/v1/messages` format. Two alternative backends were discussed but deferred:
+
+**OpenRouter**
+- OpenRouter exposes an OpenAI-compatible API (`/v1/chat/completions`), not an Anthropic-compatible one.
+- Cannot be a config-only swap — requires replacing `anthropic` SDK with `openai` SDK in `cascade.py`, updating model names to OpenRouter format (e.g. `anthropic/claude-haiku-4-5`), and changing the message construction to the OpenAI format.
+- Also requires removing the keyring/Anthropic API key flow from the setup wizard and replacing it with an OpenRouter key.
+- Not worthwhile for single-user use given Haiku's low cost and the existing $10 ceiling.
+
+**Local LLM via Ollama** (for zero API cost)
+- Ollama exposes an OpenAI-compatible endpoint at `http://localhost:11434/v1`.
+- Same SDK swap as OpenRouter (`openai` SDK with `base_url` pointed at Ollama).
+- Model names change to Ollama model names (e.g. `qwen2.5:7b`, `llama3.1:8b`).
+- Setup wizard step 2 (API key) would be removed or replaced with an Ollama model-selection step.
+- **Trade-offs:**
+  - Tier 5 vision quality drops significantly — local vision models (`llama3.2-vision`, `moondream`) are much weaker than Sonnet on dense scanned documents.
+  - JSON reliability is lower; parsing/retry logic around LLM calls would need hardening.
+  - Slower unless running on GPU. A 7B model needs ~5–8GB RAM on top of Nomic Embed.
+  - Since Tier 3 (local embeddings) already handles most files, Tiers 4/5 are the exception path — actual cost savings depend on how many files fall through to those tiers.
+- Implement by: swapping `anthropic` SDK → `openai` SDK in `cascade.py`; pointing `base_url` at Ollama; updating `tier4_model` / `tier5_model` in `config.json` to Ollama model names.
+
+**Not pursued:** a proxy that speaks the Anthropic API format (e.g. LiteLLM) wrapping OpenRouter or Ollama — adds infrastructure complexity without proportional benefit for single-user use.
+
 ---
 
 ## Configuration (`config.json`)

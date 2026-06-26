@@ -321,7 +321,12 @@ def _call_llm_tier(
 ) -> dict | None:
     try:
         import anthropic
-        client = anthropic.Anthropic()
+        import keyring
+        api_key = keyring.get_password("sortilege", "anthropic_api_key")
+        if not api_key:
+            _logger.warning("No Anthropic API key in keyring — skipping LLM tier")
+            return None
+        client = anthropic.Anthropic(api_key=api_key)
 
         taxonomy = _build_taxonomy_context()
         snippet = file.get("extracted_snippet") or ""

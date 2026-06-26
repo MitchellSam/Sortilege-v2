@@ -632,5 +632,14 @@ async def api_setup_finish(req: SetupFinishRequest):
 # Static UI + setup redirect
 # ---------------------------------------------------------------------------
 
+@app.get("/setup")
+async def setup_page():
+    from fastapi.responses import FileResponse
+    index = _UI_DIST / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return {"detail": "UI not built — run npm run build in sortilege/ui"}
+
 if _UI_DIST.exists():
     app.mount("/app", StaticFiles(directory=str(_UI_DIST), html=True), name="ui")
+    app.mount("/assets", StaticFiles(directory=str(_UI_DIST / "assets")), name="assets")

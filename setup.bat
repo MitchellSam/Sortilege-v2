@@ -2,11 +2,11 @@
 setlocal
 
 echo [1/4] Creating virtual environment...
-uv venv .venv
+uv venv --clear --python 3.11 .venv
 if errorlevel 1 goto error
 
 echo [2/4] Installing Python dependencies...
-.venv\Scripts\uv pip install -r requirements.txt
+uv pip install --python .venv\Scripts\python.exe -r requirements.txt
 if errorlevel 1 goto error
 
 echo [3/4] Building React UI...
